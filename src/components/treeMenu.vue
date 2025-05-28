@@ -56,10 +56,12 @@
 
 <script setup>
 import { useRouter } from 'vue-router';
-
+import { useStore } from 'vuex';
 const props =  defineProps(['menuData','index'])
 const router = useRouter()
+const store = useStore()
 const handleClick = (item,active) =>{
+  store.commit('addMenu', item.meta)
   router.push(item.meta.path)
 }
 </script>
