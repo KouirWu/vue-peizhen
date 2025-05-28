@@ -9,6 +9,7 @@
         @open="handleOpen"
         @close="handleClose"
         :collapse="isCollapse"
+        :collapse-transition="true"
       >
       <p class="logo-lg">{{ isCollapse ? 'DIDI' : 'DIDI陪诊' }}</p>
         <TreeMenu :index="1" :menuData="menuData" />
@@ -40,12 +41,14 @@ const handleClose = () =>{
 <style lang="less" scoped>
 .aside-container{
     height: 100%;
+    transition: width 0.01s;
     .logo-lg {
         font-size: 20px;
         text-align: center;
         height: 50px;
         line-height: 50px;
         color: #fff;
+        transition: all 0.01s;
     }
 }
 </style>
