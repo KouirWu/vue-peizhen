@@ -1,7 +1,7 @@
 <template>
     <div class="header-container">
         <div class="header-left flex-box">
-            <el-icon class="icon" size="20"><Fold /></el-icon>
+            <el-icon class="icon" size="20"  @click="store.commit('collapseMenu')"><Fold /></el-icon>
         </div>
         <div class="header-right ">
             <el-dropdown>
@@ -27,7 +27,10 @@
         
 </template>
 
-<script setup></script>
+<script setup>
+    import { useStore } from 'vuex';
+    const store = useStore()
+</script>
 
 <style lang="less" scoped>
 .flex-box{
