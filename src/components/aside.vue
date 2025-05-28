@@ -1,5 +1,6 @@
 <template>
  <el-menu
+        :style="{ width: '230px'}"
         active-text-color="#ffd04b"
         background-color="#545c64"
         class="aside-container"
@@ -9,7 +10,7 @@
         @close="handleClose"
       >
       <p class="logo-lg">DIDI陪诊</p>
-        <TreeMenu  :menuData="menuData" />
+        <TreeMenu :index="1" :menuData="menuData" />
       </el-menu>
 </template>
 
