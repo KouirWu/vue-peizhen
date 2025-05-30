@@ -12,6 +12,7 @@
         }}</el-link>
       </div>
       <el-form
+        ref="loginFormRef"
         :model="loginForm"
         style="max-width: 600px"
         class="demo-ruleForm"
@@ -51,7 +52,8 @@
 
 <script setup>
 import { ref, reactive } from "vue";
-import { getCode } from "../../api";
+import { getCode, userAuthentication, login } from "../../api";
+import { Lock, UserFilled } from "@element-plus/icons-vue";
 const imgUrl = new URL("../../../public/login-head.png", import.meta.url).href;
 
 //表单初始数据
@@ -91,10 +93,23 @@ const validatePass = (rule, value, callback) => {
       : callback(new Error("密码格式不对，需要4到16位字符，请确认格式是否正确"));
   }
 };
-//表单校验
+/**
+ * 验证码校验函数
+ * 注册时验证码不能为空
+ */
+const validateCode = (rule, value, callback) => {
+  if (formType.value && value === "") {
+    callback(new Error("请输入验证码"));
+  } else {
+    callback();
+  }
+};
+
+//表单校验规则
 const rules = reactive({
   userName: [{ validator: validateUser, trigger: "blur" }],
   passWord: [{ validator: validatePass, trigger: "blur" }],
+  validCode: [{ validator: validateCode, trigger: "blur" }],
 });
 
 //发送短信
@@ -115,11 +130,12 @@ const countdownChange = () => {
     });
   }
   //倒计时
-  setInterval(() => {
+  const time = setInterval(() => {
     if (countdown.time <= 0) {
       countdown.time = 60;
       countdown.validText = `获取验证码`;
       flag = false;
+      clearInterval(time);
     } else {
       countdown.time -= 1;
       countdown.validText = `剩余${countdown.time}s`;
@@ -136,8 +152,89 @@ const countdownChange = () => {
   });
 };
 
-//表单提交
-const submitForm = () => {};
+const loginFormRef = ref();
+
+/**
+ * 表单提交函数
+ * 根据formType判断是登录还是注册
+ * 先进行表单验证，验证通过后再调用对应的API
+ */
+const submitForm = async () => {
+  if (!loginFormRef.value) return;
+
+  try {
+    // 手动触发表单校验
+    const valid = await loginFormRef.value.validate();
+
+    if (valid) {
+      console.log("表单验证通过，开始提交");
+
+      // 根据formType判断是注册还是登录
+      if (formType.value) {
+        // 注册逻辑
+        try {
+          const { data } = await userAuthentication(loginForm);
+          if (data.code == 10000) {
+            ElMessage({
+              message: "注册成功",
+              type: "success",
+            });
+            // 注册成功后切换到登录页面
+            formType.value = 0;
+            // 清空表单
+            loginForm.userName = "";
+            loginForm.passWord = "";
+            loginForm.validCode = "";
+          } else {
+            ElMessage({
+              message: data.message || "注册失败",
+              type: "error",
+            });
+          }
+        } catch (error) {
+          console.error("注册请求失败:", error);
+          ElMessage({
+            message: "注册请求失败，请稍后重试",
+            type: "error",
+          });
+        }
+      } else {
+        // 登录逻辑
+        try {
+          const { data } = await login(loginForm);
+          if (data.code == 10000) {
+            ElMessage({
+              message: "登录成功",
+              type: "success",
+            });
+            localStorage.setItem("pz_token", data.data.token);
+            localStorage.setItem("pz_userInfo", JSON.stringify(data.data.userInfo));
+
+            // 这里可以添加登录成功后的跳转逻辑
+            // 例如：router.push('/dashboard')
+          } else {
+            ElMessage({
+              message: data.message || "登录失败",
+              type: "error",
+            });
+          }
+        } catch (error) {
+          console.error("登录请求失败:", error);
+          ElMessage({
+            message: "登录请求失败，请稍后重试",
+            type: "error",
+          });
+        }
+      }
+    }
+  } catch (error) {
+    console.log("表单验证失败:", error);
+    ElMessage({
+      message: "请检查输入信息是否正确",
+      type: "warning",
+    });
+  }
+};
 </script>
 
 <style lang="less" scoped>
