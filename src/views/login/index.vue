@@ -54,6 +54,8 @@
 import { ref, reactive } from "vue";
 import { getCode, userAuthentication, login } from "../../api";
 import { Lock, UserFilled } from "@element-plus/icons-vue";
+import { ElMessage } from "element-plus";
+import { useRouter } from "vue-router";
 const imgUrl = new URL("../../../public/login-head.png", import.meta.url).href;
 
 //表单初始数据
@@ -151,7 +153,7 @@ const countdownChange = () => {
     }
   });
 };
-
+const router = useRouter();
 const loginFormRef = ref();
 
 /**
@@ -203,15 +205,22 @@ const submitForm = async () => {
         try {
           const { data } = await login(loginForm);
           if (data.code == 10000) {
-            ElMessage({
-              message: "登录成功",
-              type: "success",
-            });
+            // 先保存登录信息
             localStorage.setItem("pz_token", data.data.token);
             localStorage.setItem("pz_userInfo", JSON.stringify(data.data.userInfo));
 
-            // 这里可以添加登录成功后的跳转逻辑
-            // 例如：router.push('/dashboard')
+            // 显示成功消息（3秒后自动关闭）
+            ElMessage({
+              message: "登录成功，正在跳转...",
+              type: "success",
+              duration: 3000,
+            });
+
+            // 延迟一点时间再跳转，确保用户看到成功消息
+            setTimeout(() => {
+              // 使用 replace 方法强制跳转，确保路由守卫重新执行
+              router.replace("/dashboard");
+            }, 1000);
           } else {
             ElMessage({
               message: data.message || "登录失败",

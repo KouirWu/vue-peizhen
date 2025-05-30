@@ -15,3 +15,8 @@ export const userAuthentication = (data) =>{
 export const login = (data) =>{
     return request.post('/login',data)
 }
+
+//权限管理列表
+export const authAdmin = (params) =>{
+    return request.post('/auth/admin',{paramas})
+}

@@ -12,7 +12,7 @@ http.interceptors.request.use(function (config) {
 //不需要添加token的接口api
     const whiteUrl=['/get/code','/user/authentication','/login'] 
     if(token && !whiteUrl.includes(config.url)){
-        config.headers['X-token'] = token
+        config.headers['x-token'] = token
     }
     return config;
   }, function (error) {
@@ -27,6 +27,11 @@ http.interceptors.response.use(function (response) {
     //对接口异常的数据，给用户提示
     if(response.data.code == -1){
         ElMessage.warning(response.data.message)
+    }
+    if((response.data.code == -2)){
+        localStorage.removeItem('pz_token')
+        localStorage.removeItem('pz_userInfo')
+        window.location.href = window.location.origin + '/login'
     }
     return response;
   }, function (error) {

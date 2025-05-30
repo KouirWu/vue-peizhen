@@ -14,6 +14,7 @@ const router = createRouter({
       path: '/',
       component: Layout,
       name: 'main',
+      redirect: '/dashboard', // 添加默认重定向到控制台页面
       children: [
         {
           path: 'dashboard',
