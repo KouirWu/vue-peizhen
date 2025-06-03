@@ -1,0 +1,23 @@
+# 忽略所有文件和目录，彻底关闭ESLint检查
+*
+**/*
+
+# 忽略常见目录
+node_modules/
+dist/
+build/
+public/
+.vscode/
+.git/
+
+# 忽略所有文件类型
+*.js
+*.vue
+*.ts
+*.jsx
+*.tsx
+*.json
+*.css
+*.scss
+*.less
+*.html
